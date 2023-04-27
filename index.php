@@ -1,89 +1,87 @@
 <?php
 // Antonio Hernandez
 // INF 653
-// ToDo List Application
-// 2 - 22 - 23
+// Applying MVC Assignment
+// 3 - 6 - 23
 ?>
 
+<?php 
+    require("model/database.php");
+    require("model/item_db.php");
+    require("model/category_db.php");
 
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo List Application</title>
-</head>
+    $item_id = filter_input(INPUT_POST, 'item_id', FILTER_VALIDATE_INT);
+    $title = filter_input(INPUT_POST, 'title', FILTER_UNSAFE_RAW);
+    $description = filter_input(INPUT_POST, 'description', FILTER_UNSAFE_RAW);
+    $category_id = filter_input(INPUT_POST, 'category_id', FILTER_VALIDATE_INT);
+    $category_name = filter_input(INPUT_POST, 'category_name', FILTER_UNSAFE_RAW);
 
-<body>
-    <h1>ToDo List Application</h1>
-    <?php
-    require_once ('database.php');
+    $action = filter_input(INPUT_POST, 'action', FILTER_UNSAFE_RAW);
 
-    /*
-    $db = mysql_connect('localhost', 'root', '', 'todolist');
-
-    if (mysql_connect_error()) {
-        echo "Failed to connect to MySQL: " . mysql_connect_error();
-    }
-    */
-
-    $sql = "SELECT * FROM todoitems";
-    $statement = $conn->prepare($sql);
-    $statement->execute();
-    //$result = mysql_query($db, $sql);
-    if ($statement->rowCount() == 0) {
-        echo "No todo list items exist yet.";
-    } else {
-        echo "<table border='1'>
-                <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Remove</th>
-            </tr>";
-        while ($row = $statement->fetch()) {
-            echo "<tr>
-                    <td>".$row['Title']."</td>
-                    <td>".$row['Description']."</td>
-                    <td><a href='remove.php?id=".$row['ItemNum']."'>X</a></td>
-                </tr>";
+    if (!$action) {
+        $action = filter_input(INPUT_GET, 'action', FILTER_UNSAFE_RAW);
+        if (!$action) {
+            $action = 'list_items';
         }
-        echo "</table>";
-    }
-    ?>
-    <br>
-    <a href="add.php">Add Item</a>
-
-    <?php
-    /*
-    if (mysql_num_rows($result) > 0) {
-        echo "No to do list items exist yet.";
-    } else {
-        echo "<table border='1'> 
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Remove</th>
-            </tr>";
-        while ($row = mysql_fetch_assoc($result)) {
-            echo "<tr>
-                    <td>".$row['title']."</td>
-                    <td>".$row['description']."</td>
-                    <td><a href='remove.php?id=".$row['ItemNum']."'>X</a></td>
-                </tr>";
-        }
-        echo "</table>";
     }
 
-    mysql_close($db);
-    ?>
-    <br>
-    <a href="add.php">Add Item</a>
+    // Switch statement to determine which action to take
+    switch ($action) {
+        case "list_categories":
+            $categories = get_categories();
+            include('view/category_list.php');
+            break;
+        case "add_category":
+            if ($category_name) {
+                add_category($category_name);
+                header("Location: .?action=list_categories");
+                exit;
+            }
+            break;
+        case "add_item":
+            if ($category_id && $description && $title) {
+                add_item($title, $description, $category_id);
+                header("Location: `index.php?action=list_items&category_id=$category_id`");
+            }
+         
+            break;
+        case "delete_category":
+            if ($category_id) {
+                try {
+                    delete_category($category_id);
+                } catch (PDOException $e) {
+                    $error = "You cannot delete a category if items exist for that category.";
+                    include('view/error.php');
+                    exit();
+                }
+            }
+            header("Location: index.php?action=list_categories");
+            break;
+        case "delete_item":
+            if ($item_id) {
+                delete_item($item_id);
+            } else {
+                $error = "Missing or incorrect item id.";
+                include('view/error.php');
+                exit();
+            }
+            header("Location: index.php?action=list_items&category_id=$category_id");
+            break;
+        case "list_items":
+        default:
+            $categories = get_categories();
+            $category_name = '';
+            $items = get_items_by_category($category_id);
+            if ($category_id) {
+                $category_name = get_category_name($category_id);
+            }
+            include('view/item_list.php');
+            break;
+    }
+?>
 
-    */
-    ?>
-
-</body>
-
-</html>
+<!-- It did work until around step 11? I then changed the database item to title.
+The add item was working without the category table until I add the foreign key?
+I had everything implemented on the item_list and then moved the add item and category to 
+their own files.  -->

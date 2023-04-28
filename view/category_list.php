@@ -32,27 +32,10 @@
     <p>No categories found.</p>
 <?php endif; ?>
 
-<!-- <ul> -->
-    <?php /* foreach ($categories as $category): ?>
-        <li>
-            <?php echo htmlspecialchars($category['categoryName']); ?>
-            <form action="index.php" method="post">
-                <input type="hidden" name="category_id" value="<?php echo $category['categoryID']; ?>">
-                <input type="hidden" name="action" value="delete_category">
-                <button type="submit">Delete</button>
-            </form>
-        </li>
-    <?php endforeach; */ ?>
-<!-- </ul> -->
 
-<!-- <h2>Add Category</h2>
-<form action="index.php" method="post">
-    <input type="text" name="categoryName">
-    <input type="hidden" name="action" value="add_category">
-    <button type="submit">Add</button>
-</form> -->
 <h2>Add Category</h2>
-<form action="." method="post">
+<form action="index.php" method="post">
+    <label for="categoryName">Category Name:</label> 
     <input type="text" name="categoryName" maxlength="50" placeholder="Category Name" required>
     <input type="hidden" name="action" value="add_category">
     <button type="submit">Add</button>

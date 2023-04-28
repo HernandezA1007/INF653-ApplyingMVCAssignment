@@ -32,14 +32,12 @@
         $statement->closeCursor();
     }
 
-    function add_category($categoryName) {
+    function add_category($categoryName) { 
         global $db;
-        $query = "INSERT INTO categories
-                     (categoryName)
-                  VALUES
-                     (:categoryName)";
+        $query = "INSERT INTO categories (categoryName) 
+                  VALUES (:categoryName)"; 
         $statement = $db->prepare($query);
-        $statement->bindValue(":categoryName", $categoryName);
+        $statement->bindValue(":categoryName", $categoryName); 
         $statement->execute();
         $statement->closeCursor();
     }

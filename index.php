@@ -35,16 +35,16 @@
         case "add_category":
             if ($category_name) {
                 add_category($category_name);
-                header("Location: .?action=list_categories");
+                header("Location: /index.php?action=list_categories");
                 exit;
             }
             break;
         case "add_item":
             if ($category_id && $description && $title) {
                 add_item($title, $description, $category_id);
-                header("Location: `index.php?action=list_items&category_id=$category_id`");
+                header("Location: index.php?action=list_items&category_id=$category_id");
+                exit;
             }
-         
             break;
         case "delete_category":
             if ($category_id) {
@@ -61,23 +61,23 @@
         case "delete_item":
             if ($item_id) {
                 delete_item($item_id);
+                header("Location: index.php?action=list_items&category_id=$category_id");
             } else {
                 $error = "Missing or incorrect item id.";
                 include('view/error.php');
                 exit();
-            }
-            header("Location: index.php?action=list_items&category_id=$category_id");
-            break;
-        case "list_items":
+            }            break;
+        // case "list_items":
         default:
             $categories = get_categories();
-            $category_name = '';
+            // $category_name = '';
+            $categories = get_categories();
             $items = get_items_by_category($category_id);
-            if ($category_id) {
-                $category_name = get_category_name($category_id);
-            }
+            // if ($category_id) {
+            //     $category_name = get_category_name($category_id);
+            // }
             include('view/item_list.php');
-            break;
+            // break;
     }
 ?>
 
